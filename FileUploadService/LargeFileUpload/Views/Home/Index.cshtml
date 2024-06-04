@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
+<h1>Stream a file with to a database with a controller endpoint</h1>
+
+<form action="@Url.Action("UploadLargeFile", "FileUpload")" method="post" enctype="multipart/form-data">
+    <div class="input-group">
+        <input id="note" type="text" name="note" />
+        <input type="file" name="file" class="form-control mx-sm-2" />
+        <button type="submit" class="btn btn-primary">Submit non Ajax</button>
+    </div>
+</form>
+
+<div style="height:100px"></div>
+
+<h1>Stream a file with AJAX to a database with a controller endpoint</h1>
+<form id="uploadForm" data-ajax="true" action="FileUpload/UploadLargeFile" method="post"
+      enctype="multipart/form-data" onsubmit="AJAXSubmit(this);return false;">
+    <dl>
+        <dt>
+            <label for="note">Note</label>
+        </dt>
+        <dd>
+            <input id="note" type="text" name="note"  />
+        </dd>
+        <dt>
+            <label for="file">File</label>
+        </dt>
+        <dd>
+            <input id="file" type="file" name="file" multiple />
+            <input id="file2" type="file" name="file" multiple />
+        </dd>
+    </dl>
+
+    <input class="btn btn-primary" type="submit" value="Upload" />
+
+    <div style="margin-top:15px">
+        <output form="uploadForm" name="result"></output>
+    </div>
+</form>
+
+
+
+
+
+
+@section Scripts {
+      <script>
+        "use strict";
+
+        async function AJAXSubmit (oFormElement) {
+          const formData = new FormData(oFormElement);
+          try {
+            oFormElement.elements.namedItem("result").value = 'Uploading...';
+            const response = await fetch(oFormElement.action, {
+              method: 'POST',
+              headers: {
+                'RequestVerificationToken': getCookie('RequestVerificationToken')
+              },
+              body: formData
+            });
+
+            oFormElement.elements.namedItem("result").value = 
+              'Result: ' + response.status + ' ' + response.statusText;
+
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        }
+
+        function getCookie (name) {
+          var value = "; " + document.cookie;
+          var parts = value.split("; " + name + "=");
+          if (parts.length == 2) return parts.pop().split(";").shift();
+        }
+
+      </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#fileUpload").fileUpload();
+        });
+    </script>
+  }
